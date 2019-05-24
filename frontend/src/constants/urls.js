@@ -1,0 +1,1 @@
+export const BASE_APPLICATION_URL = "http://www.google.pl";
