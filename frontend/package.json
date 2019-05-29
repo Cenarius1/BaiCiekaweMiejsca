@@ -4,7 +4,7 @@
   "description": "Local events in your pocket",
   "scripts": {
     "start": "webpack-dev-server --open --config webpack/webpack.config.dev.js",
-    "build": "rm -rf dist && webpack --config webpack/webpack.config.prod.js  && cp -a assets/ dist/",
+    "build": "rimraf dist && webpack --config webpack/webpack.config.prod.js && xcopy /I /E \"assets\" \"dist/assets\" ",
     "prod": "serve ./dist -s",
     "lint": "eslint src",
     "ngrok": "ngrok http -region eu 8080",
