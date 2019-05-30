@@ -2,89 +2,89 @@ const functions = require('firebase-functions');
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser')
+const firebase = require("firebase");
+// require("firebase/firestore");
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+const config = {
+    apiKey: "AIzaSyAdyBU9OJSLdVFyJ4g4OWaTghDWNM1G5Tg",
+    authDomain: "bai-1212.firebaseapp.com",
+    projectId: "bai-1212",
+    databaseURL: "https://bai-1212.firebaseio.com"
+};
+firebase.initializeApp(config);
+const db = firebase.firestore();
+
 
 app.get('/getAllEvent', (request, response) => {
-    //request.setHeader('Content-Type', 'application/json');
-    let eventArray = [
-        {
-            id:1,
-            title:"Ice Hokey Match",
-            date:"10-12-2019",
-            cost:0,
-            organizers:"UEK",
-            rating: 10,
-        },
-        {
-            id:2,
-            title:"Super Summer",
-            date:"05-07-2019",
-            cost:100,
-            organizers:"Krakov City",
-            rating: 5
-        }
-    ]
-    response.json(eventArray);
-});
+    db.collection("Events").get()
+        .then(snapshot => {
+            let arr = [];
+            snapshot.forEach(doc => {
+                console.log(doc.id, '=>', doc.data());
+                arr.push(doc.data());
+            });
+            response.json(arr);
+            return null;
+        })
+        .catch(err => {
+            console.log('Error getting documents', err.message);
+            response.send(err.message);
+        });
 
+});
 
 app.get('/getEventDetailById/:id?', (request, response) => {
-    const id = parseInt(request.params.id, 10);
-    let detailEveevent = [
-        {
-            id:1,
-            title:"Ice Hokey Match",
-            date:"10-12-2019",
-            cost:0,
-            organizers:"UEK",
-            rating: 10,
-            localization: "Nowakowska 10",
-            contact:12345,
-            description: "Awesome place to see many intresting facts",
-            fullDescription: "The series was originally published in English by two major publishers, Bloomsbury in the United Kingdom and Scholastic Press in the United States. A play, Harry Potter and the Cursed Child, based on a story co-written by Rowling, premiered in London on 30 July 2016 at the Palace Theatre, and its script was published by Little, Brown. The original seven books were adapted.",
-        },
-        {
-            id:2,
-            title:"Super Summer",
-            date:"05-07-2019",
-            cost:100,
-            organizers:"Krakov City",
-            rating: 5,
-            localization: "Wodna 10",
-            contact:12345,
-            description: "This article is about the series of novels. For other uses, including related topics and derivative works",
-            fullDescription: "Since the release of the first novel, Harry Potter and the Philosopher's Stone, on 26 June 1997, the books have found immense popularity, critical acclaim and commercial success worldwide. They have attracted a wide adult audience as well as younger readers and are often considered cornerstones of modern young adult literature.[2] As of February 2018, the books have sold more",
-        }
-    ]
-    const result = detailEveevent.filter(x=>x.id === id);
+    // const id = parseInt(request.params.id, 10);
+    console.log("xxxxxxxxxxxxxxx " + request.params.id);
+    if (request.params.id === null) {
+        response.send("Invalid Argument");
+    }
 
-    response.json(result);
+    const doc = db.collection("Events").doc(request.params.id);
+    doc.get().then(doc => {
+        const data = doc.data();
+        console.log(data);
+        response.json(data);
+        return null;
+    }).catch(err => {
+        console.log('Error getting documents', err.message);
+        response.send(err.message);
+    });
 });
+
+
 
 app.post('/addEvent', (request, response) => {
-    let title = request.body.title;
-    let date = request.body.date;
-    let cost = request.body.cost;
-    let organizers = request.body.organizers;
-    let rating = request.body.rating;
-    let localization = request.body.localization;
-    let contact = request.body.contact;
-    let description = request.body.description;
-    let fullDescription = request.body.fullDescription;
+    //validation
 
-    response.send(`
-    <p>${title}</p>
-    <p>${date}</p>
-    <p>${cost}</p>
-    <p>${organizers}</p>
-    <p>${rating}</p>
-    <p>${localization}</p>
-    <p>${contact}</p>
-    <p>${description}</p>
-    <p>${fullDescription}</p>
-    `);
+    db.collection("Events").orderBy("id", "desc").limit(1)
+        .get().then(snapshot => {
+            let gowno = snapshot.docs[0].id;
+            const idInt = parseInt(gowno, 10) + 1;
+            // console.log("xxxxxxxxxxxxxx " + idInt);
+
+            db.collection("Events").doc(idInt.toString()).set({
+                id: idInt,
+                title: request.body.title,
+                date: request.body.date,
+                cost: request.body.cost,
+                organizers: request.body.organizers,
+                rating: request.body.rating,
+                localization: request.body.localization,
+                contact: request.body.contact,
+                description: request.body.description,
+                fullDescription: request.body.fullDescription
+            });
+
+            response.json('Works');
+            return null;
+        })
+        .catch(err => {
+            console.log('Error getting documents', err);
+        });
 });
+
 
 exports.app = functions.https.onRequest(app);   
