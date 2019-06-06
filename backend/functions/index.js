@@ -1,136 +1,165 @@
-const admin = require('firebase-admin');
 const functions = require('firebase-functions');
+const admin = require('firebase-admin');
+const express = require('express');
+const cors = require('cors');
+const newGuid = require('uuid/v4');
 
 const firebaseConfig = {
-    apiKey: "AIzaSyAdyBU9OJSLdVFyJ4g4OWaTghDWNM1G5Tg",
-    authDomain: "bai-1212.firebaseapp.com",
-    databaseURL: "https://bai-1212.firebaseio.com",
-    projectId: "bai-1212",
-    storageBucket: "bai-1212.appspot.com",
-    messagingSenderId: "947233879048",
-    appId: "1:947233879048:web:998d8ff27b5f72c3"
+	apiKey: "AIzaSyAdyBU9OJSLdVFyJ4g4OWaTghDWNM1G5Tg",
+	authDomain: "bai-1212.firebaseapp.com",
+	databaseURL: "https://bai-1212.firebaseio.com",
+	projectId: "bai-1212",
+	storageBucket: "bai-1212.appspot.com",
+	messagingSenderId: "947233879048",
+	appId: "1:947233879048:web:998d8ff27b5f72c3"
 };
 
 admin.initializeApp(firebaseConfig);
-var db = admin.firestore();
+const db = admin.firestore();
+const app = express();
+app.use(cors());
 
-exports.setupDB = functions.https.onRequest((request, response) => {
-    insertEventsToDB();
-    response.status(200).send("Setup done");
-    
+app.get('/events', async (req, res) => {
+	const result = BuildResultModel();
+
+	try {
+		const queryResult = await db.collection("Events").get();
+
+		const events = [];
+		queryResult.forEach(doc => {
+			events.push(doc.data());
+		});
+
+		result.data = events;
+	} catch (err) {
+		result.success = false;
+		result.errorMessage = err.message;
+		result.data = undefined;
+	}
+
+	SendResponse(result, res);
 });
 
-exports.getAllEvents = functions.https.onRequest((request, response) => {
-    db.collection("Events").get()
-        .then(snapshot => {
-            let arr = [];
-            snapshot.forEach(doc => {
-                arr.push(doc.data());
-            });
-            response.json(arr);
-            return null;
-        })
-        .catch(err => {
-            console.log('Error getting documents', err.message);
-            response.send(err.message);
-        });
+app.get('/events/:id', async (req, res) => {
+	const result = BuildResultModel();
+
+	if (req.params.id === null) {
+		result.data = undefined;
+		result.success = false;
+		result.errorMessage = "Invalid argument, EventId is required";
+	} else {
+		try {
+			const queryResult = await db.collection("Events").doc(req.params.id).get();
+			const event = queryResult.data();
+			result.data = event;
+		} catch (err) {
+			result.errorMessage = err.message;
+			result.success = false;
+			result.data = undefined;
+		}
+	}
+
+	SendResponse(result, res);
 });
 
+app.post('/events', async (req, res) => {
+	const result = BuildResultModel();
 
+	const validationErrors = ValidateEventRequest(req);
 
-exports.addEvent = functions.https.onRequest((request, response) => {
-    db.collection("Events").orderBy("id", "desc").limit(1)
-    .get().then(snapshot => {
-        let gowno = snapshot.docs[0].id;
-        const idInt = parseInt(gowno, 10) + 1;
-        db.collection("Events").doc(idInt.toString()).set({
-            id: idInt,
-            title: request.body.title,
-            date: request.body.date,
-            cost: request.body.cost,
-            organizers: request.body.organizers,
-            rating: request.body.rating,
-            localization: request.body.localization,
-            contact: request.body.contact,
-            description: request.body.description,
-            fullDescription: request.body.fullDescription
-        });
+	if (validationErrors.length > 0) {
+		result.success = false;
+		result.errorMessage = validationErrors.join('; ');
+		result.data = undefined;
+	} else {
+		const id = newGuid();
+		const event = {
+			id: id,
+			title: req.body.title,
+			date: req.body.date,
+			cost: req.body.cost,
+			organizers: req.body.organizers,
+			rating: req.body.rating,
+			localization: req.body.localization,
+			contact: req.body.contact,
+			description: req.body.description,
+			fullDescription: req.body.fullDescription
+		};
 
-        response.status(201).json('Event has been added.');
-        return null;
-    })
-    .catch(err => {
-        console.log('Error getting documents', err.message);
-    });
+		try {
+			await db.collection("Events").doc(id).set(event);
+			result.data = event;
+		} catch (err) {
+			result.success = false;
+			result.errorMessage = err.message;
+			result.data = undefined;
+		}
+	}
+
+	SendResponse(result, res)
 });
 
-exports.getEventById = functions.https.onRequest((request, response) => {
-    if (request.query.id === null) {
-        response.send("Invalid Argument");
-    }
+app.delete('/events/:id', async (req, res) => {
+	const result = BuildResultModel();
 
-    const doc = db.collection("Events").doc(request.query.id);
-    doc.get().then(doc => {
-        const data = doc.data();
-        response.json(data);
-        return null;
-    }).catch(err => {
-        console.log('Error getting documents', err.message);
-        response.send(err.message);
-    });
+	if (req.params.id === null) {
+		result.data = undefined;
+		result.success = false;
+		result.errorMessage = "Invalid argument, EventId is required";
+	} else {
+		try {
+			await db.collection('Events').doc(req.params.id).delete();
+			result.data = `'${req.params.id}' sucessfully deleted`;
+		} catch (err) {
+			result.data = undefined;
+			result.success = false;
+			result.errorMessage = err.message;
+		}
+	}
+
+	SendResponse(result, res);
 });
 
-//https://us-central1-bai-1212.cloudfunctions.net/deleteEventById?id=1
-exports.deleteEventById = functions.https.onRequest((request, response) => {
-    const id = request.query.id;
-    if (id === null) {
-        response.send("Invalid Argument");
-    }
-    db.collection('Events').doc(id).delete();
-    response.status(200).send("deleted id: " + id);
-});
-
-function insertEventsToDB(){
-    db.collection("Events").doc("1").set({
-        id:1,
-        title:"Ice Hokey Match",
-        date:"10-12-2019",
-        cost:0,
-        organizers:"UEK",
-        rating: 10,
-        localization: "Nowakowska 10",
-        contact:4444,
-        description: "Awesome place to see many intresting facts",
-        fullDescription: "ssssss",
-        latitude:"11",
-        longitude:"33"
-    });
-    db.collection("Events").doc("2").set({
-        id:2,
-        title:"Super Sam",
-        date:"10-12-222",
-        cost:10,
-        organizers:"ABC",
-        rating: 10,
-        localization: "Zauk 40",
-        contact:364,
-        description: "Awesome place to see many intresting facts",
-        fullDescription: "zzzz",
-        latitude:"11",
-        longitude:"33"
-    });
-    db.collection("Events").doc("3").set({
-        id:3,
-        title:"Kana Domeks",
-        date:"9-12-9",
-        cost:88,
-        organizers:"CCC",
-        rating: 3,
-        localization: "Krupy 15",
-        contact:987,
-        description: "Awesome place to see many intresting facts",
-        fullDescription: "ggg",
-        latitude:"11",
-        longitude:"33"
-    });
+const SendResponse = (result, res) => {
+	if (result.success)
+		res.status(200).json(result);
+	else
+		res.status(500).json(result);
 }
+
+const ValidateEventRequest = (req) => {
+	const validationErrors = [];
+
+	if (!req.body.title)
+		validationErrors.push("Title is required");
+	if (!req.body.date)
+		validationErrors.push("Date is required");
+	if (!req.body.cost)
+		validationErrors.push("Cost is required");
+	if (!req.body.organizers)
+		validationErrors.push("Organizers is required");
+	if (!req.body.localization)
+		validationErrors.push("Localization is required");
+	if (!req.body.contact)
+		validationErrors.push("Contact is required");
+	if (!req.body.description)
+		validationErrors.push("Description is required");
+	if (!req.body.fullDescription)
+		validationErrors.push("FullDescription is required");
+	if (!req.body.rating)
+		validationErrors.push("Rating is required");
+
+	return validationErrors;
+}
+
+const BuildResultModel = (success, data, errorMessage) => {
+	return {
+		success: success || true,
+		errorMessage: errorMessage || undefined,
+		data: data || undefined
+	};
+}
+
+exports.api = functions.https.onRequest(app);
+
+
