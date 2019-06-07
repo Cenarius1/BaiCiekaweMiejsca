@@ -1,8 +1,22 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
+
+//Express imports
 const express = require('express');
 const cors = require('cors');
 const newGuid = require('uuid/v4');
+
+//Auth imports
+const passport = require('passport');
+const localStrategy = require('passport-local').Strategy;
+const facebookStrategy = require('passport-facebook').Strategy;
+const jwt = require('jsonwebtoken');
+const jwtStrategy = require('passport-jwt').Strategy;
+const ExtractJWT = require('passport-jwt').ExtractJwt;
+
+const bcrypt = require('bcrypt');
+const BCRYPT_SALT_ROUNDS = 12;
+const jwtTokenSecret = "dupa1";
 
 const firebaseConfig = {
 	apiKey: "AIzaSyAdyBU9OJSLdVFyJ4g4OWaTghDWNM1G5Tg",
@@ -14,10 +28,173 @@ const firebaseConfig = {
 	appId: "1:947233879048:web:998d8ff27b5f72c3"
 };
 
+console.log(JSON.stringify(firebaseConfig));
+
 admin.initializeApp(firebaseConfig);
 const db = admin.firestore();
 const app = express();
 app.use(cors());
+app.use(passport.initialize());
+
+passport.serializeUser((user, done) => {
+	done(null, user);
+});
+
+passport.deserializeUser((user, done) => {
+	done(null, user);
+});
+
+passport.use('jwt', new jwtStrategy({
+	jwtFromRequest: ExtractJWT.fromAuthHeaderWithScheme('bearer'),
+	secretOrKey: jwtTokenSecret,
+}, async (jwt_payload, done) => {
+	try {
+		console.log("ID: " + jwt_payload.id);
+		const documentSnapshot = await db.collection("Users").doc(jwt_payload.id).get();
+
+		if (!documentSnapshot.exists) {
+			done(null, false, { message: `Unable to find user '${jwt_payload.username}'` });
+		} else {
+			done(null, documentSnapshot.data())
+		}
+	} catch (err) {
+		done(err);
+	}
+}));
+
+passport.use('register-local', new localStrategy({
+	usernameField: 'username',
+	passwordField: 'password',
+	session: false,
+}, async (username, password, done) => {
+	try {
+		console.log("Inside RegisterLocal Strategy...");
+		const querySnapshot = await db.collection("Users").where("username", "==", username).limit(1).get();
+
+		if (!querySnapshot.empty) {
+			return done(null, false, { message: "Username already taken" });
+		} else {
+			const hashedPassword = await bcrypt.hash(password, BCRYPT_SALT_ROUNDS);
+
+			const id = newGuid();
+			const newUser = {
+				id: id,
+				vendor: "local",
+				username: username,
+				password: hashedPassword,
+				name: ""
+			};
+
+			await db.collection("Users").doc(id).set(newUser);
+			console.log("Query done...");
+
+			return done(null, newUser);
+		}
+	} catch (err) {
+		return done(err);
+	}
+}));
+
+passport.use('login-local', new localStrategy({
+	usernameField: 'username',
+	passwordField: 'password',
+	session: false,
+}, async (username, password, done) => {
+	const querySnapshot = await db.collection("Users").where("username", "==", username).limit(1).get();
+
+	if (!querySnapshot.empty) {
+		const user = querySnapshot.docs[0].data();
+		const compareResult = await bcrypt.compare(password, user.password);
+
+		console.log("Compare result:" + compareResult);
+
+		if (compareResult) {
+			return done(null, user);
+		} else {
+			return done(null, false, { message: "Wrong password" });
+		}
+	} else {
+		return done(null, false, { message: `Unable to find user '${username}'` });
+	}
+}));
+
+app.post('/auth/register-local', async (req, res, next) => {
+	passport.authenticate('register-local', (err, user, info) => {
+		console.log("Inside auth");
+		const result = BuildResultModel();
+		if (err) {
+			result.success = false;
+			result.errorMessage = "Error occured during registering user, message: " + err.message;
+		} else {
+			if (!user) {
+				result.success = false;
+				result.errorMessage = "Unable to register user, message: '" + info.message + "'";
+			} else {
+				delete user.password;
+				var token = jwt.sign(user, jwtTokenSecret);
+				result.data = {
+					user: user,
+					token: token
+				}
+			}
+		}
+
+		console.log(JSON.stringify(result));
+
+		SendResponse(result, res);
+	})(req, res, next);
+});
+
+app.post('/auth/login-local', async (req, res, next) => {
+	passport.authenticate('login-local', (err, user, info) => {
+		const result = BuildResultModel();
+		if (err) {
+			result.success = false;
+			result.errorMessage = `Error occured during authenticating user, error: '${err.message}'`;
+		} else {
+			if (!user) {
+				result.success = false;
+				result.errorMessage = "Unable to authenticate user, message: '" + info.message + "'";
+			} else {
+				delete user.password;
+				var token = jwt.sign(user, jwtTokenSecret);
+				result.data = {
+					user: user,
+					token: token
+				}
+			}
+		}
+
+		SendResponse(result, res);
+	})(req, res, next)
+});
+
+app.get('/auth/validate', async (req, res, next) => {
+	passport.authenticate('jwt', (err, user, info) => {
+		const result = BuildResultModel();
+		if (err) {
+			result.success = false;
+			result.errorMessage = `Error occured during validating jwt token, error: '${err.message}'`;
+		} else {
+			if (!user) {
+				result.success = false;
+				result.errorMessage = "Unable to validate jwt token, message: '" + info.message + "'";
+			} else {
+				delete user.password;
+				result.data = {
+					user: user,
+					tokenValid: true
+				}
+			}
+		}
+
+		if (result.success) {
+			res.status(200).send(result);
+		} else {
+			res.status(401).send(result);
+		}
+	})(req, res, next);
+})
 
 app.get('/events', async (req, res) => {
 	const result = BuildResultModel();
@@ -99,6 +276,10 @@ app.post('/events', async (req, res) => {
 	SendResponse(result, res)
 });
 
+app.get('/events-secured', passport.authenticate('jwt'), (req, res, next) => {
+	res.send("This is ultra secured endpoint and only authenticated user can access this! shieeeeeeeeeeeeet :D");
+});
+
 app.delete('/events/:id', async (req, res) => {
 	const result = BuildResultModel();
 
@@ -161,5 +342,3 @@ const BuildResultModel = (success, data, errorMessage) => {
 }
 
 exports.api = functions.https.onRequest(app);
-
-

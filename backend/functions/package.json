@@ -13,10 +13,16 @@
     "node": "8"
   },
   "dependencies": {
+    "bcrypt": "^3.0.6",
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "firebase-admin": "~7.0.0",
     "firebase-functions": "^2.3.0",
+    "jsonwebtoken": "^8.5.1",
+    "passport": "^0.4.0",
+    "passport-facebook": "^3.0.0",
+    "passport-jwt": "^4.0.0",
+    "passport-local": "^1.0.0",
     "uuid": "^3.3.2"
   },
   "devDependencies": {
