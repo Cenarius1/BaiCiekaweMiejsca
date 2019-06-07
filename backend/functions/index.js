@@ -14,6 +14,8 @@ const jwt = require('jsonwebtoken');
 const jwtStrategy = require('passport-jwt').Strategy;
 const ExtractJWT = require('passport-jwt').ExtractJwt;
 
+const facebookConfig = require("./facebookConfig");
+
 const bcrypt = require('bcrypt');
 const BCRYPT_SALT_ROUNDS = 12;
 const jwtTokenSecret = "dupa1";
@@ -27,8 +29,6 @@ const firebaseConfig = {
 	messagingSenderId: "947233879048",
 	appId: "1:947233879048:web:998d8ff27b5f72c3"
 };
-
-console.log(JSON.stringify(firebaseConfig));
 
 admin.initializeApp(firebaseConfig);
 const db = admin.firestore();
@@ -62,6 +62,41 @@ passport.use('jwt', new jwtStrategy({
 	}
 }));
 
+passport.use(new facebookStrategy(facebookConfig,
+	async (accessToken, refreshToken, profile, done) => {
+		console.log("AccessToken: " + JSON.stringify(accessToken));
+		console.log("RefreshToken: " + JSON.stringify(refreshToken));
+		console.log("Profile: " + JSON.stringify(profile));
+		try {
+			const querySnapshot = await db.collection("Users").where("facebookId", "==", profile.id).limit(1).get();
+
+			const userData = {
+				id: undefined,
+				vendor: "facebook",
+				username: profile.emails[0].value,
+				password: "",
+				facebookId: profile.id,
+				displayName: profile.displayName
+			};
+
+			if (!querySnapshot.empty) {
+				const user = querySnapshot.docs[0].data();
+				userData.id = user.id;
+				await db.collection("Users").doc(user.id).set(userData);
+
+				return done(null, user);
+			} else {
+				const newId = newGuid();
+				userData.id = newId;
+				await db.collection("Users").doc(newId).set(userData);
+				return done(null, userData);
+			}
+		} catch (err) {
+			return done(err);
+		}
+	}
+));
+
 passport.use('register-local', new localStrategy({
 	usernameField: 'username',
 	passwordField: 'password',
@@ -82,7 +117,8 @@ passport.use('register-local', new localStrategy({
 				vendor: "local",
 				username: username,
 				password: hashedPassword,
-				name: ""
+				displayName: username,
+				facebookId: ""
 			};
 
 			await db.collection("Users").doc(id).set(newUser);
@@ -117,6 +153,35 @@ passport.use('login-local', new localStrategy({
 		return done(null, false, { message: `Unable to find user '${username}'` });
 	}
 }));
+
+app.get("/auth/facebook", passport.authenticate("facebook", { scope: 'email' })); //Just redirect to the facebook login page.
+
+app.get("/auth/facebook/callback", (req, res, next) => {
+	passport.authenticate("facebook", (err, user, info) => {
+		const result = BuildResultModel();
+
+		if (err) {
+			result.success = false;
+			result.errorMessage = "Error occured during authenticating user using facebook, message: " + err.message;
+		} else {
+			if (!user) {
+				result.success = false;
+				result.errorMessage = `Unable to authorize user using facebook, message: '${info.message}'`;
+			} else {
+				delete user.password;
+				var token = jwt.sign(user, jwtTokenSecret);
+				result.data = {
+					user: user,
+					token: token
+				}
+			}
+		}
+
+		console.log(JSON.stringify(result));
+
+		SendResponse(result, res);
+	})(req, res, next);
+});
 
 app.post('/auth/register-local', async (req, res, next) => {
 	passport.authenticate('register-local', (err, user, info) => {
