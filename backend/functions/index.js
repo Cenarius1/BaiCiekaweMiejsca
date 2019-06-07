@@ -86,8 +86,12 @@ passport.use(new facebookStrategy(facebookConfig,
 	}
 ));
 
-passport.use('register-local', new localStrategy(localConfig, async (username, password, done) => {
+passport.use('register-local', new localStrategy(localConfig, async (req, username, password, done) => {
 	try {
+		if (!req.body.displayName && !req.body.displayName.length < 3) {
+			return done(null, false, { message: "displayName is required and must have at least 3 characters" });
+		}
+
 		console.log("Inside RegisterLocal Strategy...");
 		const querySnapshot = await db.collection("Users").where("username", "==", username).limit(1).get();
 
@@ -102,7 +106,7 @@ passport.use('register-local', new localStrategy(localConfig, async (username, p
 				vendor: "local",
 				username: username,
 				password: hashedPassword,
-				displayName: username,
+				displayName: req.body.displayName,
 				facebookId: ""
 			};
 
