@@ -1,6 +1,6 @@
 import { NAME } from './constants';
 import reducer from './reducer';
-import View from './mapPage';
+import View from './eventFormPage';
 
 export default {
     NAME,

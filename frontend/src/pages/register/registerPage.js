@@ -1,35 +1,24 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Link } from 'react-router-dom'
 
 import * as actions from './actions';
 
-import AuthForm from '../../components/Auth/AuthForm';
+import RegisterForm from '../../components/Auth/RegisterForm';
 
-const LoginPage = ({ handleSubmit, formUpdate, login, password, remember, navigation }) => {
+const LoginPage = ({ handleSubmit, formUpdate, login, password, displayName, navigation }) => {
   return (
     <div className="container">
       <div className="row">
         <div className="col-sm-6 offset-sm-3 col-md-8 offset-md-2">
           <h1>LocaEvents</h1>
-          <h3>Sign-in</h3>
-          <AuthForm
+          <h3>Register</h3>
+          <RegisterForm
             onSubmit={handleSubmit}
             onUpdate={formUpdate}
             login={login}
             password={password}
-            remember={remember} />
-        </div>
-      </div>
-      <div className="row">
-        <div className="col-sm-12">
-          <Link to="/register">Or register new account</Link>
-        </div>
-      </div>
-      <div className="row">
-        <div className="col-sm-12">
-          <div className="fb-login-button" data-width="" data-size="large" data-button-type="login_with" data-auto-logout-link="false" data-use-continue-as="false" />
+            displayName={displayName} />
         </div>
       </div>
     </div>
@@ -39,15 +28,15 @@ const LoginPage = ({ handleSubmit, formUpdate, login, password, remember, naviga
 LoginPage.propTypes = {
   login: PropTypes.string.isRequired,
   password: PropTypes.string.isRequired,
-  remember: PropTypes.bool.isRequired,
+  displayName: PropTypes.string.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   formUpdate: PropTypes.func.isRequired
 };
 
 const mapStateToProps = (state) => ({
-  login: state.LoginPage.login,
-  password: state.LoginPage.password,
-  remember: state.LoginPage.remember
+  login: state.RegisterPage.login,
+  password: state.RegisterPage.password,
+  displayName: state.RegisterPage.displayName
 });
 
 const mapDispatchToProps = (dispatch) => ({

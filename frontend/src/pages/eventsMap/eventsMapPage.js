@@ -6,7 +6,7 @@ import Map from '../../components/Maps/Map';
 
 import * as actions from './actions';
 
-const LoginPage = ({ }) => {
+const EventsMapPage = ({ }) => {
   return (
 
     <div style={{ width: "100%", height: "100%" }}>  <Map style={{ width: "400px", height: "600px" }} markers={[{
@@ -20,7 +20,7 @@ const LoginPage = ({ }) => {
   );
 };
 
-LoginPage.propTypes = {
+EventsMapPage.propTypes = {
 
 };
 
@@ -32,4 +32,4 @@ const mapDispatchToProps = (dispatch) => ({
 
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(LoginPage);
+export default connect(mapStateToProps, mapDispatchToProps)(EventsMapPage);
