@@ -12,23 +12,15 @@ const localStrategy = require('passport-local').Strategy;
 const facebookStrategy = require('passport-facebook').Strategy;
 const jwt = require('jsonwebtoken');
 const jwtStrategy = require('passport-jwt').Strategy;
-const ExtractJWT = require('passport-jwt').ExtractJwt;
 
-const facebookConfig = require("./facebookConfig");
+const facebookConfig = require("./configs/facebookStrategyConfig");
+const jwtConfig = require("./configs/jwtStrategyConfig");
+const localConfig = require("./configs/localStrategyConfig");
+const firebaseConfig = require("./configs/firebaseConfig");
 
+//Encryption
 const bcrypt = require('bcrypt');
 const BCRYPT_SALT_ROUNDS = 12;
-const jwtTokenSecret = "dupa1";
-
-const firebaseConfig = {
-	apiKey: "AIzaSyAdyBU9OJSLdVFyJ4g4OWaTghDWNM1G5Tg",
-	authDomain: "bai-1212.firebaseapp.com",
-	databaseURL: "https://bai-1212.firebaseio.com",
-	projectId: "bai-1212",
-	storageBucket: "bai-1212.appspot.com",
-	messagingSenderId: "947233879048",
-	appId: "1:947233879048:web:998d8ff27b5f72c3"
-};
 
 admin.initializeApp(firebaseConfig);
 const db = admin.firestore();
@@ -44,10 +36,7 @@ passport.deserializeUser((user, done) => {
 	done(null, user);
 });
 
-passport.use('jwt', new jwtStrategy({
-	jwtFromRequest: ExtractJWT.fromAuthHeaderWithScheme('bearer'),
-	secretOrKey: jwtTokenSecret,
-}, async (jwt_payload, done) => {
+passport.use('jwt', new jwtStrategy(jwtConfig, async (jwt_payload, done) => {
 	try {
 		console.log("ID: " + jwt_payload.id);
 		const documentSnapshot = await db.collection("Users").doc(jwt_payload.id).get();
@@ -97,11 +86,7 @@ passport.use(new facebookStrategy(facebookConfig,
 	}
 ));
 
-passport.use('register-local', new localStrategy({
-	usernameField: 'username',
-	passwordField: 'password',
-	session: false,
-}, async (username, password, done) => {
+passport.use('register-local', new localStrategy(localConfig, async (username, password, done) => {
 	try {
 		console.log("Inside RegisterLocal Strategy...");
 		const querySnapshot = await db.collection("Users").where("username", "==", username).limit(1).get();
@@ -131,11 +116,7 @@ passport.use('register-local', new localStrategy({
 	}
 }));
 
-passport.use('login-local', new localStrategy({
-	usernameField: 'username',
-	passwordField: 'password',
-	session: false,
-}, async (username, password, done) => {
+passport.use('login-local', new localStrategy(localConfig, async (username, password, done) => {
 	const querySnapshot = await db.collection("Users").where("username", "==", username).limit(1).get();
 
 	if (!querySnapshot.empty) {
@@ -154,7 +135,7 @@ passport.use('login-local', new localStrategy({
 	}
 }));
 
-app.get("/auth/facebook", passport.authenticate("facebook", { scope: 'email' })); //Just redirect to the facebook login page.
+app.get("/auth/facebook", passport.authenticate("facebook", { scope: 'email' }));
 
 app.get("/auth/facebook/callback", (req, res, next) => {
 	passport.authenticate("facebook", (err, user, info) => {
@@ -169,7 +150,7 @@ app.get("/auth/facebook/callback", (req, res, next) => {
 				result.errorMessage = `Unable to authorize user using facebook, message: '${info.message}'`;
 			} else {
 				delete user.password;
-				var token = jwt.sign(user, jwtTokenSecret);
+				var token = GenerateJWTToken(user);
 				result.data = {
 					user: user,
 					token: token
@@ -196,7 +177,7 @@ app.post('/auth/register-local', async (req, res, next) => {
 				result.errorMessage = "Unable to register user, message: '" + info.message + "'";
 			} else {
 				delete user.password;
-				var token = jwt.sign(user, jwtTokenSecret);
+				var token = GenerateJWTToken(user);
 				result.data = {
 					user: user,
 					token: token
@@ -222,7 +203,7 @@ app.post('/auth/login-local', async (req, res, next) => {
 				result.errorMessage = "Unable to authenticate user, message: '" + info.message + "'";
 			} else {
 				delete user.password;
-				var token = jwt.sign(user, jwtTokenSecret);
+				var token = GenerateJWTToken(user);
 				result.data = {
 					user: user,
 					token: token
@@ -407,3 +388,7 @@ const BuildResultModel = (success, data, errorMessage) => {
 }
 
 exports.api = functions.https.onRequest(app);
+
+function GenerateJWTToken(user) {
+	return jwt.sign(user, jwtConfig.secretOrKey);
+}
