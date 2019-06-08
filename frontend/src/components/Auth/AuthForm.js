@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const AuthForm = ({ onSubmit, onUpdate, login, password, remember }) => (
+const AuthForm = ({ onSubmit, onUpdate, login, password, isBusy }) => (
   <form >
     <div className="form-group">
       <label>Email address</label>
@@ -26,16 +26,12 @@ const AuthForm = ({ onSubmit, onUpdate, login, password, remember }) => (
         value={password}
         onChange={(changeEvent) => onUpdate("password", changeEvent)} />
     </div>
-    <div className="form-group form-check">
-      <input
-        type="checkbox"
-        className="form-check-input"
-        id="exampleCheck1"
-        checked={remember}
-        onChange={(changeEvent) => onUpdate("remember", changeEvent)} />
-      <label className="form-check-label" htmlFor="exampleCheck1">Check me out</label>
-    </div>
-    <button className="btn btn-primary" onClick={(event) => onSubmit(event)}>Submit</button>
+    <button className="btn btn-primary" onClick={event => onSubmit(event)} disabled={isBusy}>
+      {isBusy && <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true" />}
+
+      {isBusy && "Authenticating..."}
+      {!isBusy && "Sign-in"}
+    </button>
   </form>
 );
 
@@ -44,7 +40,7 @@ AuthForm.propTypes = {
   onUpdate: PropTypes.func.isRequired,
   login: PropTypes.string.isRequired,
   password: PropTypes.string.isRequired,
-  remember: PropTypes.bool.isRequired
+  isBusy: PropTypes.bool.isRequired
 };
 
 export default AuthForm;

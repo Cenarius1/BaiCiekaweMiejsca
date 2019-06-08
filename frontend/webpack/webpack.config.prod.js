@@ -6,20 +6,12 @@ const PreloadWebpackPlugin = require('preload-webpack-plugin')
 
 module.exports = {
   entry: {
-    main: resolve(__dirname, '../src'),
-    vendor: [
-      'react',
-      'react-dom',
-      'react-redux',
-      'react-router-dom',
-      'redux',
-      'redux-thunk',
-      'emotion',
-    ],
+    //main: resolve(__dirname, '../src'),
+    app: "./src/index.js"
   },
   output: {
-    filename: '[name].[chunkhash].js',
-    path: resolve(__dirname, '../dist'),
+    filename: '[name].bundle.js',
+    path: resolve(__dirname),
     publicPath: '/',
   },
   module: {
@@ -43,12 +35,12 @@ module.exports = {
       },
     }),
     new webpack.optimize.UglifyJsPlugin(),
-    new webpack.optimize.CommonsChunkPlugin({
-      names: ['vendor', 'manifest'],
-    }),
+    // new webpack.optimize.CommonsChunkPlugin({
+    //   names: ['vendor', 'manifest'],
+    // }),
     new HtmlWebpackPlugin({
       filename: 'index.html',
-      title: 'redux-react-starter',
+      title: 'LocaEvents',
       template: 'webpack/template.html',
     }),
     new PreloadWebpackPlugin({

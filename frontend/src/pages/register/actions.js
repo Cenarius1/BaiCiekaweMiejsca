@@ -1,4 +1,7 @@
 import history from '../../history';
+import * as tokenStore from '../../infrastructure/tokenStore';
+import { request, HTTP_METHOD } from '../../helpers/request';
+import { BASE_API_URL } from '../../constants/urls';
 
 import * as CONSTANTS from './constants';
 
@@ -11,14 +14,33 @@ export const onResetState = () => {
 };
 
 export const onSubmitClick = (event) => {
-    return (dispatch, getState) => {
+    return async (dispatch, getState) => {
         event.preventDefault();
+        dispatch(SetBusyState(true));
 
         const currentState = getState().RegisterPage;
 
-        alert(`You typed: ${currentState.login} / ${currentState.password}, displayName: ${currentState.displayName}`);
+        const registerResult = await request(BASE_API_URL + "/api/auth/register-local", {
+            method: HTTP_METHOD.POST,
+            body: JSON.stringify({
+                username: currentState.login,
+                password: currentState.password,
+                displayName: currentState.displayName
+            })
+        });
 
-        dispatch(onResetState());
+        if (registerResult.data.success) {
+            alert("You has been sucesfully registered");
+
+            if (registerResult.data.data.token) {
+                tokenStore.set(registerResult.data.data.token);
+            }
+            history.replace("/map");
+        } else {
+            alert(registerResult.data.errorMessage);
+        }
+
+        dispatch(SetBusyState(false));
     };
 };
 
@@ -41,5 +63,11 @@ export const onFormUpdate = (field, event) => {
                 fieldValue: newValue
             }
         });
+    };
+};
+
+const SetBusyState = (isBusy) => {
+    return (dispatch, getState) => {
+        dispatch({ type: CONSTANTS.UPDATE_BUSY_STATUS, payload: { isBusy: isBusy } });
     };
 };

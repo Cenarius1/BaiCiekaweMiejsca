@@ -4,7 +4,8 @@ import * as CONSTANTS from './constants';
 const initialState = {
     login: "",
     password: "",
-    remember: false
+    remember: false,
+    isBusy: false
 };
 
 export default handleActions({
@@ -16,5 +17,8 @@ export default handleActions({
             ...state,
             [action.payload.fieldName]: action.payload.fieldValue
         };
-    }
+    }, 
+    [CONSTANTS.UPDATE_BUSY_STATUS]: (state, action) => {
+        return { ...state, isBusy: action.payload.isBusy };
+    },
 }, initialState);

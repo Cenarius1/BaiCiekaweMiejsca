@@ -1,42 +1,48 @@
-import React from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import RegisterForm from '../../components/Auth/RegisterForm';
+import auth from '../../infrastructure/auth';
 
 import * as actions from './actions';
 
-import RegisterForm from '../../components/Auth/RegisterForm';
+class RegisterPage extends Component {
+  constructor(props) {
+    super(props);
+  }
 
-const LoginPage = ({ handleSubmit, formUpdate, login, password, displayName, navigation }) => {
-  return (
-    <div className="container">
+  componentDidMount() {
+    auth.navigateToAppIfAuthericated();
+  }
+
+  render() {
+    return (<div className="container">
       <div className="row">
         <div className="col-sm-6 offset-sm-3 col-md-8 offset-md-2">
           <h1>LocaEvents</h1>
           <h3>Register</h3>
-          <RegisterForm
-            onSubmit={handleSubmit}
-            onUpdate={formUpdate}
-            login={login}
-            password={password}
-            displayName={displayName} />
+          <RegisterForm login={this.props.login} formUpdate={this.props.formUpdate} isBusy={this.props.isBusy} password={this.props.password} displayName={this.props.displayName} event={event} handleSubmit={this.props.handleSubmit} />
         </div>
       </div>
-    </div>
-  );
-};
+    </div>);
+  }
 
-LoginPage.propTypes = {
+}
+
+RegisterPage.propTypes = {
   login: PropTypes.string.isRequired,
   password: PropTypes.string.isRequired,
   displayName: PropTypes.string.isRequired,
   handleSubmit: PropTypes.func.isRequired,
-  formUpdate: PropTypes.func.isRequired
+  formUpdate: PropTypes.func.isRequired,
+  isBusy: PropTypes.bool.isRequired
 };
 
 const mapStateToProps = (state) => ({
   login: state.RegisterPage.login,
   password: state.RegisterPage.password,
-  displayName: state.RegisterPage.displayName
+  displayName: state.RegisterPage.displayName,
+  isBusy: state.RegisterPage.isBusy
 });
 
 const mapDispatchToProps = (dispatch) => ({
@@ -44,4 +50,4 @@ const mapDispatchToProps = (dispatch) => ({
   formUpdate: (field, event) => dispatch(actions.onFormUpdate(field, event))
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(LoginPage);
+export default connect(mapStateToProps, mapDispatchToProps)(RegisterPage);
