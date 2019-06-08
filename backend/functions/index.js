@@ -120,7 +120,7 @@ passport.use('register-local', new localStrategy(localConfig, async (req, userna
 	}
 }));
 
-passport.use('login-local', new localStrategy(localConfig, async (username, password, done) => {
+passport.use('login-local', new localStrategy(localConfig, async (req, username, password, done) => {
 	const querySnapshot = await db.collection("Users").where("username", "==", username).limit(1).get();
 
 	if (!querySnapshot.empty) {
