@@ -1,0 +1,22 @@
+.event {
+  margin: 10px;
+  padding: 10px;
+  border: 1px solid #bbb;
+  background-color: #eee;
+  cursor: pointer;
+}
+
+.event span {
+  font-size: 1.2em;
+  text-decoration: none;
+  color: #333;
+}
+
+.event h2 {
+  color: #fe7f00;
+}
+
+.event eventFooter {
+  text-align: left;
+  color: #a9a9a9;
+}
