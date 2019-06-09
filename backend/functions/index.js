@@ -219,43 +219,48 @@ app.post('/auth/login-local', async (req, res, next) => {
 	})(req, res, next)
 });
 
-app.get('/auth/validate', async (req, res, next) => {
-	passport.authenticate('jwt', (err, user, info) => {
-		const result = BuildResultModel();
-		if (err) {
-			result.success = false;
-			result.errorMessage = `Error occured during validating jwt token, error: '${err.message}'`;
-		} else {
-			if (!user) {
-				result.success = false;
-				result.errorMessage = "Unable to validate jwt token, message: '" + info.message + "'";
-			} else {
-				delete user.password;
-				result.data = {
-					user: user,
-					tokenValid: true
-				}
-			}
-		}
-
-		if (result.success) {
-			res.status(200).send(result);
-		} else {
-			res.status(401).send(result);
-		}
-	})(req, res, next);
-})
-
-app.get('/events', async (req, res) => {
+app.get('/events', passport.authenticate('jwt'), async (req, res) => {
 	const result = BuildResultModel();
 
 	try {
-		const queryResult = await db.collection("Events").get();
+		const eventsQuerySnapshot = await db.collection("Events").get();
+		const ratingQuerySnapshot = await db.collection("Ratings").get();
 
 		const events = [];
-		queryResult.forEach(doc => {
-			events.push(doc.data());
-		});
+
+		eventsQuerySnapshot.forEach(eventDoc => {
+			const event = eventDoc.data();
+			let ratingSum = 0;
+			let ratingCount = 0;
+			let ratingRated = false;
+
+			if (!ratingQuerySnapshot.empty) {
+				ratingQuerySnapshot.forEach(ratingDock => {
+					const rating = ratingDock.data();
+					if (rating.eventId === event.id) {
+						ratingSum += rating.rate;
+						ratingCount += 1;
+
+						if (rating.userId === req.user.id && ratingRated === false) {
+							ratingRated = true;
+						}
+					}
+				});
+			}
+
+			let average = 0;
+			if (ratingCount !== 0) {
+				average = ratingSum / ratingCount;
+			}
+
+			event.rating = {
+				count: ratingCount,
+				average: average,
+				rated: ratingRated
+			}
+
+			events.push(event);
+		})
 
 		result.data = events;
 	} catch (err) {
@@ -267,7 +272,7 @@ app.get('/events', async (req, res) => {
 	SendResponse(result, res);
 });
 
-app.get('/events/:id', async (req, res) => {
+app.get('/events/:id', passport.authenticate('jwt'), async (req, res) => {
 	const result = BuildResultModel();
 
 	if (req.params.id === null) {
@@ -276,12 +281,54 @@ app.get('/events/:id', async (req, res) => {
 		result.errorMessage = "Invalid argument, EventId is required";
 	} else {
 		try {
-			const queryResult = await db.collection("Events").doc(req.params.id).get();
-			const event = queryResult.data();
-			result.data = event;
+			const eventsDocumentSnapshot = await db.collection("Events").doc(req.params.id).get();
+			if (eventsDocumentSnapshot.exists) {
+				const event = eventsDocumentSnapshot.data();
+
+				const ratingQuerySnapshot = await db.collection("Ratings").where("eventId", "==", event.id).get();
+
+				if (!ratingQuerySnapshot.empty) {
+					let ratingSum = 0;
+					let ratingCount = 0;
+					let ratingRated = false;
+
+					ratingQuerySnapshot.forEach(ratingDoc => {
+						const rating = ratingDoc.data();
+						ratingCount += 1;
+						ratingSum += rating.rate;
+
+						if (rating.userId === req.user.id && ratingRated === false) {
+							ratingRated = true;
+						}
+					});
+
+					let average = 0;
+					if (ratingCount > 0) {
+						average = ratingSum / ratingCount
+					}
+
+					event.rating = {
+						count: ratingCount,
+						average: average,
+						rated: ratingRated
+					}
+				} else {
+					event.rating = {
+						count: 0,
+						average: 0,
+						rated: false
+					}
+				}
+
+				result.data = event;
+			} else {
+				result.data = undefined;
+				result.success = false;
+				result.errorMessage = `There is no event with id: '${req.params.id}'`;
+			}
 		} catch (err) {
-			result.errorMessage = err.message;
 			result.success = false;
+			result.errorMessage = err;
 			result.data = undefined;
 		}
 	}
@@ -289,7 +336,17 @@ app.get('/events/:id', async (req, res) => {
 	SendResponse(result, res);
 });
 
-app.post('/events', async (req, res) => {
+// {
+// 	"name": "name",
+// 	"description": "someDescription",
+// 	"localization": {
+// 		"longitude": 12.34,
+// 		"latitude": 12.123,
+// 	},
+// 	"date": 1234567890,
+// 	"type": "event"
+// }
+app.post('/events', passport.authenticate('jwt'), async (req, res) => {
 	const result = BuildResultModel();
 
 	const validationErrors = ValidateEventRequest(req);
@@ -302,19 +359,29 @@ app.post('/events', async (req, res) => {
 		const id = newGuid();
 		const event = {
 			id: id,
-			title: req.body.title,
-			date: req.body.date,
-			cost: req.body.cost,
-			organizers: req.body.organizers,
-			rating: req.body.rating,
-			localization: req.body.localization,
-			contact: req.body.contact,
+			name: req.body.name,
 			description: req.body.description,
-			fullDescription: req.body.fullDescription
-		};
+			localization: {
+				longitude: req.body.localization.longitude,
+				latitude: req.body.localization.latitude
+			},
+			date: req.body.date,
+			type: req.body.type,
+			user: {
+				id: req.user.id,
+				displayName: req.user.displayName
+			}
+		}
 
 		try {
 			await db.collection("Events").doc(id).set(event);
+
+			event.rating = {
+				count: 0,
+				average: 0,
+				rated: false
+			}
+
 			result.data = event;
 		} catch (err) {
 			result.success = false;
@@ -326,11 +393,7 @@ app.post('/events', async (req, res) => {
 	SendResponse(result, res)
 });
 
-app.get('/events-secured', passport.authenticate('jwt'), (req, res, next) => {
-	res.send("This is ultra secured endpoint and only authenticated user can access this! shieeeeeeeeeeeeet :D");
-});
-
-app.delete('/events/:id', async (req, res) => {
+app.delete('/events/:id', passport.authenticate('jwt'), async (req, res) => {
 	const result = BuildResultModel();
 
 	if (req.params.id === null) {
@@ -339,13 +402,104 @@ app.delete('/events/:id', async (req, res) => {
 		result.errorMessage = "Invalid argument, EventId is required";
 	} else {
 		try {
-			await db.collection('Events').doc(req.params.id).delete();
-			result.data = `'${req.params.id}' sucessfully deleted`;
+			const documentSnapshot = await db.collection("Events").doc(req.params.id).get();
+
+			if (documentSnapshot.exists) {
+				const event = documentSnapshot.data();
+
+				if (event.user.id === req.user.id) {
+					await db.collection('Events').doc(req.params.id).delete();
+					result.data = `'${req.params.id}' sucessfully deleted`;
+				} else {
+					result.data = undefined;
+					result.success = false;
+					result.errorMessage = `You can't delete event with id: '${req.params.id}', you aren't owner of this event.`;
+				}
+			} else {
+				result.data = undefined;
+				result.success = false;
+				result.errorMessage = `Event with id: '${req.params.id}' doesn't exist and can't be deleted`;
+			}
+
 		} catch (err) {
 			result.data = undefined;
 			result.success = false;
 			result.errorMessage = err.message;
 		}
+	}
+
+	SendResponse(result, res);
+});
+
+// {
+// 	"eventId": "someId",
+// 	"rate": 3
+// }
+
+app.get('/rating', passport.authenticate('jwt'), async (req, res) => {
+	const result = BuildResultModel();
+
+	const ratingsQuerySnapshot = await db.collection("Ratings").get();
+
+	const ratings = [];
+	ratingsQuerySnapshot.forEach(doc => {
+		ratings.push(doc.data());
+	});
+
+	result.data = ratings;
+
+	SendResponse(result, res);
+});
+
+app.post('/rating', passport.authenticate('jwt'), async (req, res) => {
+	const result = BuildResultModel();
+
+	const evnetId = req.body.eventId;
+	const rate = req.body.rate;
+
+	try {
+		if (rate <= 0 || rate >= 5) {
+			result.data = undefined;
+			result.success = false;
+			result.errorMessage = "Invalid argument, Rate must be between 1 - 5";
+		} else {
+			if (evnetId === null) {
+				result.data = undefined;
+				result.success = false;
+				result.errorMessage = "Invalid argument, EventId is required";
+			} else {
+				const documentSnapshot = await db.collection("Events").doc(evnetId).get();
+
+				if (!documentSnapshot.exists) {
+					result.data = undefined;
+					result.success = false;
+					result.errorMessage = `Event with EventId '${evnetId}' doesn't exist`;
+				} else {
+					const ratingQuerySnapshot = await db.collection("Ratings").where("eventId", "==", evnetId).where("userId", "==", req.user.id).get();
+
+					if (!ratingQuerySnapshot.empty) {
+						result.data = undefined;
+						result.success = false;
+						result.errorMessage = `Unable to rate Event with EventId: '${evnetId}'. You already rated this event`;
+					} else {
+						const id = newGuid();
+						const rating = {
+							id: id,
+							eventId: evnetId,
+							userId: req.user.id,
+							rate: rate
+						}
+
+						await db.collection("Ratings").doc(id).set(rating);
+						result.data = rating;
+					}
+				}
+			}
+		}
+	} catch (err) {
+		result.data = undefined;
+		result.success = false;
+		result.errorMessage = err.message;
 	}
 
 	SendResponse(result, res);
@@ -361,24 +515,32 @@ const SendResponse = (result, res) => {
 const ValidateEventRequest = (req) => {
 	const validationErrors = [];
 
-	if (!req.body.title)
-		validationErrors.push("Title is required");
-	if (!req.body.date)
-		validationErrors.push("Date is required");
-	if (!req.body.cost)
-		validationErrors.push("Cost is required");
-	if (!req.body.organizers)
-		validationErrors.push("Organizers is required");
-	if (!req.body.localization)
-		validationErrors.push("Localization is required");
-	if (!req.body.contact)
-		validationErrors.push("Contact is required");
+	if (!req.body.name)
+		validationErrors.push("Name is required");
 	if (!req.body.description)
 		validationErrors.push("Description is required");
-	if (!req.body.fullDescription)
-		validationErrors.push("FullDescription is required");
-	if (!req.body.rating)
-		validationErrors.push("Rating is required");
+
+	if (!req.body.localization) {
+		validationErrors.push("Localization is required");
+	} else {
+		if (!req.body.localization.longitude) {
+			validationErrors.push("Localization longitude is required");
+		}
+		if (!req.body.localization.latitude) {
+			validationErrors.push("Localization latitude is required");
+		}
+	}
+
+	if (!req.body.date)
+		validationErrors.push("Date is required");
+
+	if (!req.body.type) {
+		validationErrors.push("Type is required");
+	} else {
+		if (req.body.type !== "event" && req.body.type !== "place") {
+			validationErrors.push("Type must be 'event' or 'place'");
+		}
+	}
 
 	return validationErrors;
 }
