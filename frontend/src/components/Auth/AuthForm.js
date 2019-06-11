@@ -2,9 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 const AuthForm = ({ onSubmit, onUpdate, login, password, isBusy }) => (
-  <form >
+  <form>
     <div className="form-group">
-      <label>Email address</label>
+      <label  htmlFor="exampleInputEmail1" className="sr-only">Email address</label>
       <input type="email"
         className="form-control"
         id="exampleInputEmail1"
@@ -19,7 +19,7 @@ const AuthForm = ({ onSubmit, onUpdate, login, password, isBusy }) => (
         className="form-text text-muted">{"We'll never share your email with anyone else."}</small>
     </div>
     <div className="form-group">
-      <label htmlFor="exampleInputPassword1">Password</label>
+      <label htmlFor="exampleInputPassword1" className="sr-only">Password</label>
       <input type="password"
         className="form-control"
         id="exampleInputPassword1"
@@ -28,10 +28,10 @@ const AuthForm = ({ onSubmit, onUpdate, login, password, isBusy }) => (
         disabled={isBusy}
         onChange={(changeEvent) => onUpdate("password", changeEvent)} />
     </div>
-    <button className="btn btn-primary" onClick={event => onSubmit(event)} disabled={isBusy}>
+    <button className="btn btn-lg btn-primary btn-block" onClick={event => onSubmit(event)} disabled={isBusy}>
       {isBusy && <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true" />}
 
-      {isBusy && "Authenticating..."}
+      {isBusy && " Authenticating..."}
       {!isBusy && "Sign-in"}
     </button>
   </form>
