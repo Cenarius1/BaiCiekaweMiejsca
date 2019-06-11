@@ -35,7 +35,7 @@ class RegisterPage extends Component {
       "height": "100%"
     }}>
       <div className="row">
-        <div className="col-sm-12 col-md-12 offset-md-12 text-center">
+        <div className="col-sm-12 col-md-12 text-center">
         <img src={logo} width="72" height="72" className="mb-4" />
           <h1>LocaEvents</h1>
           <h2>Register</h2>

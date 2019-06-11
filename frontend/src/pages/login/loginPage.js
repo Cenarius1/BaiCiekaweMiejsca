@@ -36,18 +36,15 @@ class LoginPage extends Component {
       "height": "100%"
     }}>
       <div className="row">
-      <div className="col-sm-12 col-md-12 offset-md-12 text-center">
-        <img src={logo} width="72" height="72" className="mb-4" />
+        <div className="col-sm-12 col-md-12 text-center">
+          <img src={logo} width="72" height="72" className="mb-4" />
           <h1>LocaEvents</h1>
-          <h3>Please Sign-in</h3>
+          <h2>Please Sign-in</h2>
           <AuthForm onSubmit={this.props.handleSubmit} onUpdate={this.props.formUpdate} login={this.props.login} password={this.props.password} isBusy={this.props.isBusy} />
           <div className="col-sm-12 text-center">
             <p className="mt-3 mb-3 text-muted"><Link to="/register">Or register new account</Link></p>
           </div>
         </div>
-      </div>
-      <div className="row">
-
       </div>
     </div>);
   }

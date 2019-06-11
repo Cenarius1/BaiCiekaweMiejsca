@@ -1,0 +1,34 @@
+.btn-grey {
+    background-color:#D8D8D8;
+}
+
+.btn-vote {
+	margin: 2px;
+}
+
+.block {
+	background-color:#FAFAFA;
+	border:1px solid #EFEFEF;
+	padding:15px 15px 20px 15px;
+	border-radius:3px;
+}
+
+.overlay {
+	/* Height & width depends on how you want to reveal the overlay (see JS below) */    
+	height: 100%;
+	width: 100%;
+	position: fixed; /* Stay in place */
+	z-index: 1; /* Sit on top */
+	left: 0;
+	top: 0;
+	background-color: rgba(255,255,255, 0.7); /* Black w/opacity */
+	overflow-x: hidden; /* Disable horizontal scroll */
+  }
+
+.overlay-content {
+	position: relative;
+	top: 25%; /* 25% from the top */
+	width: 100%; /* 100% width */
+	text-align: center; /* Centered text/links */
+	margin-top: 30px; /* 30px top margin to avoid conflict with the close button on smaller screens */
+  }
