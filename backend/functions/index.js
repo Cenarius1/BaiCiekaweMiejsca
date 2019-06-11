@@ -458,7 +458,7 @@ app.post('/rating', passport.authenticate('jwt'), async (req, res) => {
 	const rate = req.body.rate;
 
 	try {
-		if (rate <= 0 || rate >= 5) {
+		if (rate <= 0 || rate > 5) {
 			result.data = undefined;
 			result.success = false;
 			result.errorMessage = "Invalid argument, Rate must be between 1 - 5";
