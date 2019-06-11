@@ -82,13 +82,13 @@ class EventDetailsPage extends Component {
 
           {this.props.event.rating.rated && <span>You already voted for this event</span>}
           {!this.props.event.rating.rated && <span>Please take your vote</span>}
-          {!this.props.event.rating.rated && <div>
+          <div>
             <button type="button" className={this.getVoteButtonStyles(average, 1)} disabled={this.props.event.rating.rated} onClick={() => this.props.vote(1)} aria-label="Left Align"> 1</button>
             <button type="button" className={this.getVoteButtonStyles(average, 2)} disabled={this.props.event.rating.rated} onClick={() => this.props.vote(2)} aria-label="Left Align"> 2</button>
             <button type="button" className={this.getVoteButtonStyles(average, 3)} disabled={this.props.event.rating.rated} onClick={() => this.props.vote(3)} aria-label="Left Align"> 3</button>
             <button type="button" className={this.getVoteButtonStyles(average, 4)} disabled={this.props.event.rating.rated} onClick={() => this.props.vote(4)} aria-label="Left Align"> 4</button>
             <button type="button" className={this.getVoteButtonStyles(average, 5)} disabled={this.props.event.rating.rated} onClick={() => this.props.vote(5)} aria-label="Left Align"> 5</button>
-          </div>}
+          </div>
         </div>
         <div className="block mt-2 mb-2">
 
