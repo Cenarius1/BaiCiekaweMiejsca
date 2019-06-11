@@ -25,7 +25,7 @@ export const request = async (url, { method, headers, body }) => {
 
   if (method == HTTP_METHOD.GET) {
     if (body) {
-      console.warning("HTTP GET performed with BODY available, removing BODY before send");
+      console.warn("HTTP GET performed with BODY available, removing BODY before send");
     }
     body = undefined;
   }

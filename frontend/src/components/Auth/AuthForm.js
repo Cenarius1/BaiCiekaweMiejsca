@@ -11,6 +11,7 @@ const AuthForm = ({ onSubmit, onUpdate, login, password, isBusy }) => (
         aria-describedby="emailHelp"
         placeholder="Enter email"
         value={login}
+        disabled={isBusy}
         name="login"
         onChange={(changeEvent) => onUpdate("login", changeEvent)} />
       <small
@@ -24,6 +25,7 @@ const AuthForm = ({ onSubmit, onUpdate, login, password, isBusy }) => (
         id="exampleInputPassword1"
         placeholder="Password"
         value={password}
+        disabled={isBusy}
         onChange={(changeEvent) => onUpdate("password", changeEvent)} />
     </div>
     <button className="btn btn-primary" onClick={event => onSubmit(event)} disabled={isBusy}>

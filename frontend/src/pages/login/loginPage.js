@@ -23,7 +23,11 @@ class LoginPage extends Component {
         <div className="col-sm-6 offset-sm-3 col-md-8 offset-md-2">
           <h1>LocaEvents</h1>
           <h3>Sign-in</h3>
-          <AuthForm onSubmit={this.props.handleSubmit} onUpdate={this.props.formUpdate} login={this.props.login} password={this.props.password} isBusy={this.props.isBusy} />
+          <AuthForm onSubmit={this.props.handleSubmit}
+            onUpdate={this.props.formUpdate}
+            login={this.props.login}
+            password={this.props.password}
+            isBusy={this.props.isBusy} />
         </div>
       </div>
       <div className="row">
