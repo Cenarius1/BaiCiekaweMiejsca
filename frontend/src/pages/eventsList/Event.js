@@ -21,7 +21,7 @@ class Event extends Component {
       }
 
     render() {
-        return (<div onClick={() => this.props.onClick(this.props.id)} className="event">
+        return (<div onClick={() => this.props.onClick(this.props.id)} className="col-sm-3 event">
             <h2>{this.props.name}</h2>
             <h3>Owner: {this.props.owner}</h3>
             <h3>Rating: {this.props.rating}</h3>

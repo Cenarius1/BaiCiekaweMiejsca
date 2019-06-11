@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import RegisterForm from '../../components/Auth/RegisterForm';
 import auth from '../../infrastructure/auth';
+import logo from '../../assets/logo.png';
 
 import * as actions from './actions';
 
@@ -34,9 +35,10 @@ class RegisterPage extends Component {
       "height": "100%"
     }}>
       <div className="row">
-        <div className="col-sm-12 col-md-12 offset-md-12">
+        <div className="col-sm-12 col-md-12 offset-md-12 text-center">
+        <img src={logo} width="72" height="72" className="mb-4" />
           <h1>LocaEvents</h1>
-          <h3>Register</h3>
+          <h2>Register</h2>
           <RegisterForm
             login={this.props.login}
             formUpdate={this.props.formUpdate}

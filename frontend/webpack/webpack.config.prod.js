@@ -21,9 +21,14 @@ module.exports = {
         include: [resolve(__dirname, '../src')],
         use: 'babel-loader',
       }, {
-        test: /\.css$/,  
+        test: /\.css$/,
         //include: /node_modules/,  
         loaders: ['style-loader', 'css-loader'],
+      }, {
+        test: /\.(png|svg|jpg|gif)$/,
+        use: [
+          'file-loader'
+        ]
       }
     ],
   },
