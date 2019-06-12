@@ -5,32 +5,18 @@ const mapStyles = {
     width: '100%',
     height: '100%'
 };
-const markerList = [
-    {
-        id: 1,
-        title: 't1',
-        name: 'n1',
-        lat: -1.2884,
-        lng: 36.8233
-    },
-    {
-        id: 2,
-        title: 't2',
-        name: 'n2',
-        lat: -1.2884,
-        lng: 37.0
-    }
-]
-export class MapContainer extends Component {
-    state = {
-        showingInfoWindow: false,
-        activeMarker: {},
-        selectedPlace: {}
-    };
+let markerList = []
 
-    doAlert = () => {
-        alert(1);
-    };
+export class MapContainer extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            showingInfoWindow: false,
+            activeMarker: {},
+            selectedPlace: {}
+        };
+        markerList = props.eventList;
+    }
 
     onMarkerClick = (props, marker, e) =>
         this.setState({
@@ -50,39 +36,42 @@ export class MapContainer extends Component {
 
     render() {
         const {
-            google
+            google,
+            eventList
         } = this.props;
 
         const initialCenter = {
             lat: -1.2884,
             lng: 36.8233
         };
-
         return (
             <Map google={google} zoom={14} onClick={this.onMapClick} style={mapStyles} initialCenter={initialCenter}>
-                {markerList.map(marker => {
-                    return (
-                        <Marker
-                            key={marker.id}
-                            onClick={this.onMarkerClick}
-                            title={marker.title}
-                            name={marker.name}
-                            position={{
-                                lat: marker.lat,
-                                lng: marker.lng
-                            }}
-                        />
-                    );
-                })}
+                {
+                    markerList.map(marker => {
+                        return (
+                            <Marker
+                                key={marker.id}
+                                onClick={this.onMarkerClick}
+                                title={marker.title}
+                                name={marker.name}
+                                position={{
+                                    lat: marker.lat,
+                                    lng: marker.lng
+                                }}
+                            />
+                        );
+                    })
+
+                }
                 <InfoWindow
                     marker={this.state.activeMarker}
                     visible={this.state.showingInfoWindow}
                 >
                     <div>
                         <h1>{this.state.selectedPlace.name}</h1>
-                        <button onClick={()=>{alert(1)}}>
+                        <button>
                             Deitals
-                            </button>
+                        </button>
                     </div>
                 </InfoWindow>
             </Map>
