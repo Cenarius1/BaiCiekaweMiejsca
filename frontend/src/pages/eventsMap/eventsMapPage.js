@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import GoogleApiWrapper from '../../components/Maps/Map.js';
 import auth from '../../infrastructure/auth';
 import * as actions from './actions';
+import { BusyIndicator } from '../../components/BusyIndicator';
 import { NavigationBottom } from '../../components/NavigationBottom';
 
 class EventsMapPage extends Component {
@@ -22,7 +23,8 @@ class EventsMapPage extends Component {
         <div>
           <NavigationBottom />
           {!this.props.isBusy && <GoogleApiWrapper events={this.props.events} initialPoint={this.props.initialPoint} onDetailsClick={this.props.navigateToDetails} />}
-          {this.props.isBusy && <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true" />}
+
+          {this.props.isBusy && <BusyIndicator text={"Loading..."} />}
         </div>
       </div>
     );

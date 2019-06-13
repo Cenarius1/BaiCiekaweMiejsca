@@ -6,6 +6,7 @@ import * as actions from './actions';
 import auth from '../../infrastructure/auth';
 import GoogleMapReact, { Point } from 'google-map-react';
 import { NavigationBottom } from '../../components/NavigationBottom';
+import { BusyIndicator } from '../../components/BusyIndicator';
 import logo from '../../assets/logo.png';
 
 class EventDetailsPage extends Component {
@@ -44,12 +45,7 @@ class EventDetailsPage extends Component {
 
     return (<div className="container">
       <NavigationBottom />
-      {this.props.isBusy && <div id="myNav" className="overlay">
-        <div className="overlay-content">
-          <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true" style={{ width: "100px", height: "100px" }} />
-          <p className="mt-2 mb-2">Loading...</p>
-        </div>
-      </div>}
+      {this.props.isBusy && <BusyIndicator text={"Loading..."} />}
       {!this.props.isBusy &&
         <div className="mb-4">
           <div className="block mt-2 mb-2">
@@ -100,7 +96,7 @@ class EventDetailsPage extends Component {
             <dl className="row">
               <dt className="col-sm-3">Temperature</dt>
               <dd className="col-sm-9"><p>{this.props.weather.temperature.temp}</p>
-              <small>Min: {this.props.weather.temperature.min} / Max: {this.props.weather.temperature.max}</small></dd>
+                <small>Min: {this.props.weather.temperature.min} / Max: {this.props.weather.temperature.max}</small></dd>
 
               <dt className="col-sm-3">Sky</dt>
               <dd className="col-sm-9">

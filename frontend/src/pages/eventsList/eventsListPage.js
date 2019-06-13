@@ -5,7 +5,7 @@ import auth from '../../infrastructure/auth';
 import * as actions from './actions';
 import EventsList from './EventsList';
 import { NavigationBottom } from '../../components/NavigationBottom';
-
+import { BusyIndicator } from '../../components/BusyIndicator';
 
 class EventsListPage extends Component {
   componentDidMount() {
@@ -34,24 +34,24 @@ class EventsListPage extends Component {
           <h2 className="EventsListPage-title">Upcoming Events</h2>
         </header>
 
-<div className="mb-5">
-        {this.props.events.map(event =>
-          <div key={event.id} className="block mt-2" onClick={() => this.props.eventClick(event.id)}>
-            <dl className="row">
-              <dt className="col-sm-3">Name</dt>
-              <dd className="col-sm-9">{event.name}</dd>
+        <div className="mb-5">
+          {this.props.events.map(event =>
+            <div key={event.id} className="block mt-2" onClick={() => this.props.eventClick(event.id)}>
+              <dl className="row">
+                <dt className="col-sm-3">Name</dt>
+                <dd className="col-sm-9">{event.name}</dd>
 
-              <dt className="col-sm-3">Description</dt>
-              <dd className="col-sm-9">
-                <p>{event.description}</p>
-              </dd>
+                <dt className="col-sm-3">Description</dt>
+                <dd className="col-sm-9">
+                  <p>{event.description}</p>
+                </dd>
 
-              <dt className="col-sm-3">Date</dt>
-              <dd className="col-sm-9">{this.formatTimestamp(event.date)}</dd>
-            </dl>
-          </div>)}
-          </div>
-        {this.props.isBusy && <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true" />}
+                <dt className="col-sm-3">Date</dt>
+                <dd className="col-sm-9">{this.formatTimestamp(event.date)}</dd>
+              </dl>
+            </div>)}
+        </div>
+        {this.props.isBusy && <BusyIndicator text={"Loading..."} />}
       </div>
     );
   }
