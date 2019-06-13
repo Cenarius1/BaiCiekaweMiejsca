@@ -18,6 +18,8 @@ const jwtConfig = require("./configs/jwtStrategyConfig");
 const localConfig = require("./configs/localStrategyConfig");
 const firebaseConfig = require("./configs/firebaseConfig");
 
+const weatherService = require("./weatherService");
+
 //Encryption
 const bcrypt = require('bcrypt');
 const BCRYPT_SALT_ROUNDS = 12;
@@ -38,7 +40,6 @@ passport.deserializeUser((user, done) => {
 
 passport.use('jwt', new jwtStrategy(jwtConfig, async (jwt_payload, done) => {
 	try {
-		console.log("ID: " + jwt_payload.id);
 		const documentSnapshot = await db.collection("Users").doc(jwt_payload.id).get();
 
 		if (!documentSnapshot.exists) {
@@ -458,7 +459,7 @@ app.post('/rating', passport.authenticate('jwt'), async (req, res) => {
 	const rate = req.body.rate;
 
 	try {
-		if (rate <= 0 || rate >= 5) {
+		if (rate <= 0 || rate > 5) {
 			result.data = undefined;
 			result.success = false;
 			result.errorMessage = "Invalid argument, Rate must be between 1 - 5";
@@ -504,6 +505,32 @@ app.post('/rating', passport.authenticate('jwt'), async (req, res) => {
 
 	SendResponse(result, res);
 });
+
+app.get('/weather/:longitude/:latitude', passport.authenticate('jwt'), async (req, res) => {
+	const result = BuildResultModel();
+
+	console.log("inside endpoint");
+
+	const longitude = req.params.longitude;
+	const latitude = req.params.latitude;
+
+	console.log("params:" + longitude + ", " + latitude);
+
+	const weatherData = await weatherService(longitude, latitude);
+
+	console.log("weatherData:" + JSON.stringify(weatherData));
+
+	if (weatherData.success) {
+		result.data = weatherData.payload;
+	} else {
+		result.success = false;
+		result.errorMessage = weatherData.errorMessage;
+	}
+
+	SendResponse(result, res);
+});
+
+weatherService
 
 const SendResponse = (result, res) => {
 	if (result.success)

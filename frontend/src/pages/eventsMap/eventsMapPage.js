@@ -10,6 +10,8 @@ import * as actions from './actions';
 import history from '../../history';
 import { BASE_API_URL } from '../../constants/urls';
 import { request, HTTP_METHOD } from '../../helpers/request';
+import { NavigationBottom } from '../../components/NavigationBottom';
+
 
 
 class EventsMapPage extends Component {
@@ -67,6 +69,7 @@ class EventsMapPage extends Component {
           <button onClick={this.goToManage}>Manage</button>
           <button onClick={this.goToEventList}>Event List</button>
           <button onClick={this.goToAddEvent}>Add event</button>
+            <NavigationBottom/>
         </div>
         <div>
           <GoogleApiWrapper eventList={this.state.eventList} ></GoogleApiWrapper>

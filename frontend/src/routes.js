@@ -12,5 +12,6 @@ export default (
     <Route exact path="/add" component={pages.eventForm.View} />
     <Route exact path="/edit/:id" component={pages.eventForm.View} />
     <Route exact path="/manage" component={pages.eventsManage.View} />
+	<Route path="*" component={pages.login.View} />
   </Switch>
 );

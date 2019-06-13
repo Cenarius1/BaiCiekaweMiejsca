@@ -10,7 +10,7 @@ module.exports = {
   ],
   output: {
     filename: 'bundle.js',
-    path: resolve(__dirname),
+    path: resolve(__dirname) + "/../www/",
     publicPath: '/',
   },
   context: resolve(__dirname, '../src'),

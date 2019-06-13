@@ -2,10 +2,11 @@
   "name": "locaevents",
   "version": "1.0.0",
   "description": "Local events in your pocket",
+  "homepage": ".",
   "scripts": {
     "start": "webpack-dev-server --open --config webpack/webpack.config.dev.js",
-    "build": "rimraf dist && webpack --config webpack/webpack.config.prod.js && xcopy /I /E \"assets\" \"dist/assets\" ",
-    "prod": "serve ./dist -s",
+    "build": "rimraf www && webpack --config webpack/webpack.config.prod.js",
+    "prod": "serve ./www -s",
     "lint": "eslint src",
     "ngrok": "ngrok http -region eu 8080",
     "test": "jest"
@@ -30,7 +31,6 @@
   "bugs": {
     "url": "https://github.com/didierfranc/redux-react-starter/issues"
   },
-  "homepage": "https://github.com/didierfranc/redux-react-starter#readme",
   "devDependencies": {
     "babel-core": "^6.25.0",
     "babel-eslint": "^7.2.3",
@@ -41,6 +41,7 @@
     "babel-preset-react": "^6.24.1",
     "babel-preset-stage-0": "^6.24.1",
     "babel-runtime": "^6.23.0",
+    "cordova-plugin-whitelist": "^1.3.3",
     "css-loader": "^2.1.1",
     "eslint": "^3.19.0",
     "eslint-config-airbnb": "^15.0.2",
@@ -61,6 +62,8 @@
   },
   "dependencies": {
     "bootstrap": "^4.3.1",
+    "cordova-android": "^8.0.0",
+    "cordova-browser": "^6.0.0",
     "emotion": "^7.3.2",
     "file-loader": "^4.0.0",
     "google-map-react": "^1.1.4",
@@ -118,5 +121,14 @@
         }
       ]
     }
+  },
+  "cordova": {
+    "plugins": {
+      "cordova-plugin-whitelist": {}
+    },
+    "platforms": [
+      "browser",
+      "android"
+    ]
   }
 }

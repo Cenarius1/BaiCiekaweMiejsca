@@ -31,7 +31,7 @@ export const onSubmitClick = (event) => {
 
         const currentState = getState().LoginPage;
 
-        const registerResult = await request(BASE_API_URL + "/api/auth/login-local", {
+        const loginResult = await request(BASE_API_URL + "/api/auth/login-local", {
             method: HTTP_METHOD.POST,
             body: JSON.stringify({
                 username: currentState.login,
@@ -39,13 +39,17 @@ export const onSubmitClick = (event) => {
             })
         });
 
-        if (registerResult.data.success) {
-            if (registerResult.data.data.token) {
-                tokenStore.set(registerResult.data.data.token);
+        if (loginResult.success) {
+            if (loginResult.data.success) {
+                if (loginResult.data.data.token) {
+                    tokenStore.set(loginResult.data.data.token);
+                }
+                history.replace("/map");
+            } else {
+                alert(loginResult.data.errorMessage);
             }
-            history.replace("/map");
         } else {
-            alert(registerResult.data.errorMessage);
+            alert("Error occured during authorization process, error: " + loginResult.message);
         }
 
         dispatch(SetBusyState(false));

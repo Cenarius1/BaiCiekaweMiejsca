@@ -36,6 +36,9 @@ export const request = async (url, { method, headers, body }) => {
     data: undefined
   };
 
+  console.log(url);
+
+
   try {
     const response = await fetch(url, {
       method: method,

@@ -1,0 +1,12 @@
+{
+  "background_color": "#FFF",
+  "display": "standalone",
+  "name": "LocaEvents",
+  "short_name": "LocaEvents",
+  "version": "io.cordova.locaevents",
+  "description": "Local events in your hand",
+  "author": "BAI-1212 Team",
+  "icons": [],
+  "start_url": "index.html",
+  "theme_color": "#0080FF"
+}
