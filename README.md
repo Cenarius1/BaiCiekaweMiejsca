@@ -7,12 +7,15 @@
 <h2>Skład zespołu projketowego</h2>
 
 Wojciech Matusiak <br>
-Adam Oramus <br> <br>
+Adam Oramus <br> 
 Sebastian Nowak <br>
 Joanna Szymanek 
 
 <h2>Cel aplikacji, jej główne cechy, screeny prezentujące funkcjonalność aplikacji</h2>
+Celem aplikacji....
 
+Diagram przypadków użycia:
+<img src="uml.png" alt="Diagram przypadków użycia">
 
 <h2>Linki do składowych projketu</h2>
 prototyp:  <br>
