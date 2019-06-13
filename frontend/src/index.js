@@ -7,6 +7,7 @@ import { Provider } from 'react-redux';
 import { render } from 'react-dom';
 import { Router } from 'react-router-dom';
 
+import * as serviceWorker from './serviceWorker';
 import createStore from './store';
 import routes from './routes';
 import history from './history';
@@ -23,4 +24,13 @@ export const Root = () => (
   </Provider>
 );
 
-if (!module.hot) render(<Root />, document.querySelector('react'));
+const startApp = () => {
+  if (!module.hot) render(<Root />, document.querySelector('react'));
+  serviceWorker.unregister();
+};
+
+if(window.cordova) {
+  document.addEventListener('deviceready', startApp, false);
+} else {
+  startApp();
+}
