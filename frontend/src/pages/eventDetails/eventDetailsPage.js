@@ -5,6 +5,7 @@ import './styles.css';
 import * as actions from './actions';
 import auth from '../../infrastructure/auth';
 import GoogleMapReact, { Point } from 'google-map-react';
+import { NavigationBottom } from '../../components/NavigationBottom';
 import logo from '../../assets/logo.png';
 
 const Tooltip = ({ title, description, rating }) =>
@@ -40,56 +41,27 @@ class EventDetailsPage extends Component {
 
   formatTimestamp(UNIX_timestamp) {
     let a = new Date(UNIX_timestamp * 1000);
-    ;
 
     return ('0' + a.getDate()).slice(-2) + '/'
       + ('0' + (a.getMonth() + 1)).slice(-2) + '/'
       + a.getFullYear() + ' '
       + ('0' + a.getHours()).slice(-2) + ':'
       + ('0' + a.getMinutes()).slice(-2) + " (" + Intl.DateTimeFormat().resolvedOptions().timeZone + " Timezone)";
-
-
-    // let months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    // let year = a.getFullYear();
-    // let month = months[a.getMonth()];
-    // let date = a.getDate();
-    // let hour = a.getHours();
-    // let min = a.getMinutes();
-    // let sec = a.getSeconds();
-    // let time = date + ' ' + month + ' ' + year + ' ' + hour + ':' + min + ':' + sec;
-    // return time;
   }
 
   render() {
     const average = this.props.event.rating.average;
 
     return (<div className="container">
+      <NavigationBottom/>
       {this.props.isBusy && <div id="myNav" className="overlay">
         <div className="overlay-content">
           <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true" style={{ width: "100px", height: "100px" }} />
           <p className="mt-2 mb-2">Loading...</p>
         </div>
       </div>}
-      {!this.props.isBusy && <div>
-        <div className="block mt-2 mb-2">
-          <h2>{this.props.event.name}</h2>
-        </div>
-        <div className="block mt-2 mb-2">
-          <h4>Average user rating</h4>
-          <span className="glyphicon glyphicon-star" aria-hidden="true" />
-          <small>Total votes: {this.props.event.rating.count}</small>
-          <h2 className="bold padding-bottom-7">{this.props.event.rating.average} <small>/ 5</small></h2>
-
-          {this.props.event.rating.rated && <span>You already voted for this event</span>}
-          {!this.props.event.rating.rated && <span>Please take your vote</span>}
-          <div>
-            <button type="button" className={this.getVoteButtonStyles(average, 1)} disabled={this.props.event.rating.rated} onClick={() => this.props.vote(1)} aria-label="Left Align"> 1</button>
-            <button type="button" className={this.getVoteButtonStyles(average, 2)} disabled={this.props.event.rating.rated} onClick={() => this.props.vote(2)} aria-label="Left Align"> 2</button>
-            <button type="button" className={this.getVoteButtonStyles(average, 3)} disabled={this.props.event.rating.rated} onClick={() => this.props.vote(3)} aria-label="Left Align"> 3</button>
-            <button type="button" className={this.getVoteButtonStyles(average, 4)} disabled={this.props.event.rating.rated} onClick={() => this.props.vote(4)} aria-label="Left Align"> 4</button>
-            <button type="button" className={this.getVoteButtonStyles(average, 5)} disabled={this.props.event.rating.rated} onClick={() => this.props.vote(5)} aria-label="Left Align"> 5</button>
-          </div>
-        </div>
+      {!this.props.isBusy && 
+      <div className="mb-4">
         <div className="block mt-2 mb-2">
 
           <dl className="row">
@@ -132,6 +104,22 @@ class EventDetailsPage extends Component {
               </GoogleMapReact>
             </dd>
           </dl>
+        </div>
+        <div className="block mt-2 mb-5">
+          <h4>Average user rating</h4>
+          <span className="glyphicon glyphicon-star" aria-hidden="true" />
+          <small>Total votes: {this.props.event.rating.count}</small>
+          <h2 className="bold padding-bottom-7">{this.props.event.rating.average} <small>/ 5</small></h2>
+
+          {this.props.event.rating.rated && <span>You already voted for this event</span>}
+          {!this.props.event.rating.rated && <span>Please take your vote</span>}
+          <div>
+            <button type="button" className={this.getVoteButtonStyles(average, 1)} disabled={this.props.event.rating.rated} onClick={() => this.props.vote(1)} aria-label="Left Align"> 1</button>
+            <button type="button" className={this.getVoteButtonStyles(average, 2)} disabled={this.props.event.rating.rated} onClick={() => this.props.vote(2)} aria-label="Left Align"> 2</button>
+            <button type="button" className={this.getVoteButtonStyles(average, 3)} disabled={this.props.event.rating.rated} onClick={() => this.props.vote(3)} aria-label="Left Align"> 3</button>
+            <button type="button" className={this.getVoteButtonStyles(average, 4)} disabled={this.props.event.rating.rated} onClick={() => this.props.vote(4)} aria-label="Left Align"> 4</button>
+            <button type="button" className={this.getVoteButtonStyles(average, 5)} disabled={this.props.event.rating.rated} onClick={() => this.props.vote(5)} aria-label="Left Align"> 5</button>
+          </div>
         </div>
       </div>}
     </div>);
