@@ -22,6 +22,19 @@ const initialState = {
             average: 0,
             rated: true
         }
+    }, 
+    weather: {
+        name: "",
+        weather: {
+            main: "",
+            description: ""
+        },
+        temperature: {
+            min: 0,
+            max: 0,
+            temp: 0
+        },
+        windSpeed: 0,
     }
 };
 
@@ -34,5 +47,8 @@ export default handleActions({
     },
     [CONSTANTS.GET_DETAILS_SUCCESS]: (state, action) => {
         return { ...state, event: action.payload.event };
+    },
+    [CONSTANTS.WEATHER_LOADED_SUCCESS]: (state, action) => {
+        return { ...state, weather: action.payload.weather };
     }
 }, initialState);

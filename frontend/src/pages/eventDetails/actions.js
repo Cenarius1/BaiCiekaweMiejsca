@@ -34,6 +34,42 @@ export const onGetDetails = (id) => {
             });
         }
 
+        dispatch(onGetWeather());
+    };
+};
+
+export const onGetWeather = () => {
+    return async (dispatch, getState) => {
+        const currentState = getState().EventDetailsPage;
+        const longitude = currentState.event.localization.longitude;
+        const latitude = currentState.event.localization.latitude;
+        try {
+            const response = await request(`https://cors-anywhere.herokuapp.com/http://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=metric&appid=90e0cff7b403e125642704f4c61af12c`, { method: "GET", headers: {}, body: undefined });
+            console.log(JSON.stringify(response));
+            const data = {
+                name: response.data.name,
+                weather: {
+                    main: response.data.weather[0].main,
+                    description: response.data.weather[0].description
+                },
+                temperature: {
+                    min: response.data.main.temp_min,
+                    max: response.data.main.temp_max,
+                    temp: response.data.main.temp
+                },
+                windSpeed: response.data.wind.speed,
+            };
+
+            dispatch({
+                type: CONSTANTS.WEATHER_LOADED_SUCCESS,
+                payload: {
+                    weather: data
+                }
+            });
+        } catch (err) {
+            alert("Error obtaining weather, message: " + err.message);
+        }
+
         dispatch(setBusy(false));
     };
 };
