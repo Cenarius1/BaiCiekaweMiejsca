@@ -4,7 +4,7 @@
 <h2>Charakterystyka projektu</h2>
 
 
-<h2>Skład zespołu projketowego</h2>
+<h2>Skład zespołu projektowego</h2>
 
 Wojciech Matusiak <br>
 Adam Oramus <br> 
@@ -18,7 +18,6 @@ Diagram przypadków użycia:
 <img src="uml.png" alt="Diagram przypadków użycia">
 
 <h2>Linki do składowych projketu</h2>
-prototyp:  <br>
-aplikacja:  <br>
-zarządzanie projektem: https://trello.com/b/Q0zHirLT/informator-ciekawych-miejsc  <br>
-repozytorium: https://github.com/Cenarius1/BaiCiekaweMiejsca  <br>
+<a href="how2html.pl">prototyp</a> <br> 
+<a href="https://trello.com/b/Q0zHirLT/informator-ciekawych-miejsc">zarządzanie projektem</a> <br>
+<a href="https://github.com/Cenarius1/BaiCiekaweMiejsca">repozytorium</a> <br>
