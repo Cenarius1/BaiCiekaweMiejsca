@@ -1,21 +1,33 @@
 <h1>Informator ciekawych miejsc</h1>
 
-
 <h2>Charakterystyka projektu</h2>
+Firebase Cloud Functions - API <br>
+Firebase Firestore - baza danych <br>
 
+Wykorzystane technologie: <br>
+backend - ExpressJS, PassportJS, JWT Tokens <br>
+frontend - ReactJS + Redux + Webpack + Cordova
 
 <h2>Skład zespołu projektowego</h2>
-
 Wojciech Matusiak <br>
 Adam Oramus <br> 
 Sebastian Nowak <br>
 Joanna Szymanek 
 
-<h2>Cel aplikacji, jej główne cechy, screeny prezentujące funkcjonalność aplikacji</h2>
-Celem aplikacji....
+<h2>Cel aplikacji</h2>
+Aplikacja dedykowana jest osobom, które chciałyby wiedzieć, co się dzieje w ich najbliższym i dalszym otoczeniu lub co warto zwiedzić. Swoją funkcjonalność oferuje tylko zalogowanym użytkownikom. Umożliwia przeglądanie obiektów i eventów na mapie oraz na liście. Użytkownik dodający aktywność, ma możliwość zarządzania nią m.in. edytując informacje.  
 
+<br>
 Diagram przypadków użycia:
 <img src="uml.png" alt="Diagram przypadków użycia">
+
+<br>
+Widok ekranu logowania
+<img src="login.png" alt="Widok ekranu logowania">
+
+<br>
+Widok eventu na mapie
+<img src="mapa.png" alt="Widok eventu na mapie">
 
 <h2>Linki do składowych projketu</h2>
 <a href="how2html.pl">prototyp</a> <br> 
