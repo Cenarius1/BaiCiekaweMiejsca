@@ -17,8 +17,8 @@ export const request = async (url, { method, headers, body }) => {
     headers["Authorization"] = 'bearer ' + token;
   }
 
-  //headers["Content-Type"] = 'text/plain';
-  //headers["Accept"] = 'text/plain';
+  headers["Content-Type"] = 'application/json';
+  headers["Accept"] = 'application/json';
 
   if (!method)
     method = HTTP_METHOD.GET;
