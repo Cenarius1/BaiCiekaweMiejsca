@@ -16,7 +16,7 @@ Sebastian Nowak <br>
 Joanna Szymanek 
 
 <h2>Cel aplikacji</h2>
-Aplikacja dedykowana jest osobom, które chciałyby wiedzieć, co się dzieje w ich najbliższym i dalszym otoczeniu lub co warto zwiedzić. Swoją funkcjonalność oferuje tylko zalogowanym użytkownikom. Umożliwia przeglądanie obiektów i eventów na mapie oraz na liście. Użytkownik dodający aktywność, ma możliwość zarządzania nią m.in. edytując informacje. Przy opisie eventu użytkownik widzi prognozę pogody przewidzianą na dzień tego wydarzenia. Dane pogodowe wyciągane są z Open Weather API.
+Aplikacja dedykowana jest osobom, które chciałyby wiedzieć, co się dzieje w ich najbliższym i dalszym otoczeniu lub co warto zwiedzić. Swoją funkcjonalność oferuje tylko zalogowanym użytkownikom. Umożliwia przeglądanie obiektów i eventów na mapie oraz na liście. Przy opisie eventu użytkownik widzi prognozę pogody przewidzianą na dzień tego wydarzenia. Dane pogodowe wyciągane są z Open Weather API.
 
 <br>
 Diagram przypadków użycia:
