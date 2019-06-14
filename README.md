@@ -43,6 +43,9 @@ Widok formularza dodawania eventu
 <img src="add.png" alt="Widok formularza dodawania eventu">
 
 <h2>Linki do składowych projketu</h2>
-<a href="http://seba.linuxpl.com/?fbclid=IwAR0EELeKn_AIUj2pHTYEiZ-nYCL6haFm-cXdq3Wh8f4yc9BMqksjNSEC_1k">prototyp</a> <br> 
-<a href="https://trello.com/b/Q0zHirLT/informator-ciekawych-miejsc">zarządzanie projektem</a> <br>
-<a href="https://github.com/Cenarius1/BaiCiekaweMiejsca">repozytorium</a> <br>
+<a href="https://bai-1212.web.app/">Aplikacja webowa</a> <br> 
+<a href="http://seba.linuxpl.com/?fbclid=IwAR0EELeKn_AIUj2pHTYEiZ-nYCL6haFm-cXdq3Wh8f4yc9BMqksjNSEC_1k">Prototyp aplikacji Mockplus</a> <br> 
+<a href="https://trello.com/b/Q0zHirLT/informator-ciekawych-miejsc">Zarządzanie projektem Trello</a> <br>
+<a href="https://github.com/Cenarius1/BaiCiekaweMiejsca">Repozytorium Git</a> <br>
+
+
