@@ -7,7 +7,7 @@ const initialState = {
     description: "",
     longitude: "",
     latitude: "",
-    date: "",
+    date: Date.now(),
     type: ""
 };
 

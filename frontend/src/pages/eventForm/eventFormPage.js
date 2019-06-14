@@ -11,7 +11,7 @@ import * as actions from './actions';
 
 class EventFormPage extends Component {
   constructor(props) {
-    super(props)
+    super(props);
   }
 
   // componentDidMount() {
@@ -45,6 +45,7 @@ class EventFormPage extends Component {
               description={this.props.description}
               longitude={this.props.longitude}
               latitude={this.props.latitude}
+              date={this.props.date}
               type={this.props.type}
               handleSubmit={this.props.handleSubmit}
               formUpdate={this.props.formUpdate}
@@ -54,10 +55,9 @@ class EventFormPage extends Component {
           </div>
         </div>
       </div>
-    )
+    );
   }
-
-};
+}
 
 EventFormPage.propTypes = {
   name: PropTypes.string.isRequired,
@@ -67,7 +67,8 @@ EventFormPage.propTypes = {
   type: PropTypes.string.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   formUpdate: PropTypes.func.isRequired,
-  isBusy: PropTypes.bool.isRequired
+  isBusy: PropTypes.bool.isRequired,
+  date: PropTypes.number.isRequired
 };
 
 const mapStateToProps = (state) => ({
@@ -76,7 +77,8 @@ const mapStateToProps = (state) => ({
   longitude: state.EventFormPage.longitude,
   latitude: state.EventFormPage.latitude,
   type: state.EventFormPage.type,
-  isBusy: state.EventFormPage.isBusy
+  isBusy: state.EventFormPage.isBusy,
+  date: state.EventFormPage.date
 });
 
 const mapDispatchToProps = (dispatch) => ({

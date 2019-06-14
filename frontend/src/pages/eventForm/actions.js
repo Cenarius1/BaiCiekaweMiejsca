@@ -1,5 +1,7 @@
 import { request, HTTP_METHOD } from '../../helpers/request';
 import { BASE_API_URL } from '../../constants/urls';
+import moment from 'moment';
+import history from '../../history';
 
 import * as CONSTANTS from './constants';
 
@@ -27,14 +29,15 @@ export const onSubmitClick = (event) => {
                     longitude: currentState.longitude,
                     latitude: currentState.latitude
                 },
-                date: 1560288887,
+                date: moment(currentState.date, 'YYYY-MM-DD').unix(),
                 type: currentState.type
             })
         });
 
         if (addResult.data.success) {
-            alert("Event added sucesfully!");     
-            console.log("Event added sucesfully!")       
+            alert("Event added sucesfully!");
+            history.push("/details/" + addResult.data.data.id);
+            console.log("Event added sucesfully!");
         } else {
             alert(addResult.data.errorMessage);
         }
@@ -47,6 +50,8 @@ export const onFormUpdate = (field, event) => {
     return (dispatch, getState) => {
         let newValue = "";
 
+
+        console.log(event.target.value);
         switch (event.target.type) {
             case "checkbox":
                 newValue = event.target.checked;
