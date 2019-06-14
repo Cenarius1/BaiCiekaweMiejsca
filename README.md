@@ -16,7 +16,7 @@ Sebastian Nowak <br>
 Joanna Szymanek 
 
 <h2>Cel aplikacji</h2>
-Aplikacja dedykowana jest osobom, które chciałyby wiedzieć, co się dzieje w ich najbliższym i dalszym otoczeniu lub co warto zwiedzić. Swoją funkcjonalność oferuje tylko zalogowanym użytkownikom. Umożliwia przeglądanie obiektów i eventów na mapie oraz na liście. Użytkownik dodający aktywność, ma możliwość zarządzania nią m.in. edytując informacje. Przy opisie eventu użytkownik widzi prognozę pogody przewidzianą na dzień tego wydarzenia. Dane pogodowe wyciągane są z Open Weather API.
+Aplikacja dedykowana jest osobom, które chciałyby wiedzieć, co się dzieje w ich najbliższym i dalszym otoczeniu lub co warto zwiedzić. Swoją funkcjonalność oferuje tylko zalogowanym użytkownikom. Umożliwia przeglądanie obiektów i eventów na mapie oraz na liście. Przy opisie eventu użytkownik widzi prognozę pogody przewidzianą na dzień tego wydarzenia. Dane pogodowe wyciągane są z Open Weather API.
 
 <br>
 Diagram przypadków użycia:
@@ -32,9 +32,20 @@ Widok eventu na mapie
 
 <br>
 Widok eventów na liście
-<img src="mapa.png" alt="Widok eventów na liście">
+<img src="lista.png" alt="Widok eventów na liście">
+
+<br>
+Widok detali eventu
+<img src="detale.png" alt="Widok detali eventu">
+
+<br>
+Widok formularza dodawania eventu
+<img src="add.png" alt="Widok formularza dodawania eventu">
 
 <h2>Linki do składowych projketu</h2>
-<a href="how2html.pl">prototyp</a> <br> 
-<a href="https://trello.com/b/Q0zHirLT/informator-ciekawych-miejsc">zarządzanie projektem</a> <br>
-<a href="https://github.com/Cenarius1/BaiCiekaweMiejsca">repozytorium</a> <br>
+<a href="https://bai-1212.web.app/">Aplikacja webowa</a> <br> 
+<a href="http://seba.linuxpl.com/?fbclid=IwAR0EELeKn_AIUj2pHTYEiZ-nYCL6haFm-cXdq3Wh8f4yc9BMqksjNSEC_1k">Prototyp aplikacji Mockplus</a> <br> 
+<a href="https://trello.com/b/Q0zHirLT/informator-ciekawych-miejsc">Zarządzanie projektem Trello</a> <br>
+<a href="https://github.com/Cenarius1/BaiCiekaweMiejsca">Repozytorium Git</a> <br>
+
+
